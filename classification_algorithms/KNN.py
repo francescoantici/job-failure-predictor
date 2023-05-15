@@ -13,6 +13,6 @@ class KNN(KNeighborsClassifier):
         "mwd" : "minkowski"
     }
         
-    def __init__(self, distance: Literal["mwd", "cd"] = "mwd") -> None:
+    def __init__(self, **args) -> None:
         
-        super().__init__(metric = self.distance_mapping.get(distance))
+        super().__init__(metric = self.distance_mapping.get(args["distance"]))
