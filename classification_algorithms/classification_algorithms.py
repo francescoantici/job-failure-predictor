@@ -15,8 +15,20 @@ classification_algorithms = {
 }
 
 def get_classification_algoritm(model_name: str = "dt", **args):
+    """
+    Returns the classification algorithm implementation corresponding to the model_name parameters passed.
+
+    Args:
+        model_name (str, optional): The name of the classification algorithm to use. Defaults to "dt".
+
+    Raises:
+        Exception: If the model_name is not among the pre-defined ones.
+
+    Returns:
+        _type_: The implementation of the classification algorithm requested.
+    """
     try:
         return classification_algorithms.get(model_name)(**args)
-    except Exception as e:
-        print("Model name inserted not correct!")
+    except:
+        raise Exception("Model name inserted not correct! Please insert 'dt', 'lr', 'rf', 'cd' or 'mwd'")
 

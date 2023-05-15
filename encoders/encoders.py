@@ -1,61 +1,85 @@
-from typing import Iterable
+from typing import Iterable, Literal
 from sklearn.preprocessing import OrdinalEncoder
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 class IntEncoder:
     """
-    An interface for the INT encoder 
+    The implementation of the INT encoding algorithm. 
+    Uses the OrdinalEncoder of scikit-learn
     """
-    @staticmethod
-    def encode(train_data: pd.DataFrame, test_data:  pd.DataFrame) -> tuple:
+    
+    def __init__(self) -> None:
+        self.encoder = OrdinalEncoder
+    
+    def encode(self, data: pd.DataFrame) -> Iterable:
         """_summary_
 
         Args:
-            train_data (pd.DataFrame): _description_
-            test_data (pd.DataFrame): _description_
+            train_data (Iterable): The dataframe containing the job features to encode
 
         Returns:
-            tuple: _description_
+            Iterable: The INT encoding of the dataframes passed as input
         """
-        for col in train_data.columns:
-            _encoder = OrdinalEncoder()
-            train_data[col] = _encoder.fit_transform(train_data.col)
-            test_data[col] = _encoder.transform(test_data.col)
-        return train_data, test_data
+        for col in data.columns:
+            _encoder = self.encoder()
+            data[col] = _encoder.fit_transform(data[col].values.reshape(-1, 1))
+        return data
         
 class SbEncoder:
-    """_summary_
     """
-    @classmethod
-    def encode(cls, train_data: Iterable, test_data: Iterable) -> Iterable:
+    The implementation of the SB encoding algorithm.
+    Uses the all-MiniLM-L6-v2 pre-trained model of the SentenceTransformer library
+    """
+    
+    def __init__(self) -> None:
+        self.encoder = SentenceTransformer("all-MiniLM-L6-v2")
+        
+    def encode(self, data: Iterable) -> Iterable:
         """_summary_
 
         Args:
-            train_data (Iterable): _description_
-            test_data (Iterable): _description_
+            train_data (Iterable): The dataframe containing the job features to encode
 
         Returns:
-            Iterable: _description_
+            Iterable: The SB encoding of the dataframes passed as input
         """
-        _encoder = SentenceTransformer("all-MiniLM-L6-v2") 
-        encoded_train = _encoder.encode(train_data.apply(cls._convert_entry_to_str, axis = 1).values)
-        encoded_test = _encoder.encode(test_data.apply(cls._convert_entry_to_str, axis = 1).values)
-        return encoded_train, encoded_test
+         
+        encoded_data= self.encoder.encode(data.apply(self._convert_entry_to_str, axis = 1).values)
+        return encoded_data
     
     @staticmethod
-    def _convert_entry_to_str(job_entry):
-        """_summary_
+    def _convert_entry_to_str(job_entry:Iterable) -> str:
+        """Internal function to map the job features to a single string
 
         Args:
-            job_entry (_type_): _description_
+            job_entry (Iterable): The job features as Iterable
 
         Returns:
-            _type_: _description_
+            str: The string created from the concatenation of the job features
         """
         return ",".join([f"{job_entry[k]}" for k in job_entry.index if (job_entry[k] and not (pd.isna(job_entry[k])))])
 
 encoders = {
-    "int" : IntEncoder,
-    "sb": SbEncoder
-}
+            "int" : IntEncoder,
+            "sb": SbEncoder
+        }
+
+def get_encoding_algorithm(encoding:str):
+    """_summary_
+    
+    Returns the encoder model corresponding to the encoding parameters passed, sb -> SbEncoder, int -> IntEncoder
+
+    Args:
+        encoding (str): _description_
+
+    Raises:
+        Exception: If the name of the encoding is not correct
+
+    Returns:
+        encoder: The encoder model selected
+    """
+    try:
+        return encoders.get(encoding)()
+    except:
+        raise Exception("Wrong encoding algorithm inserted, please insert 'sb' or 'int'.")

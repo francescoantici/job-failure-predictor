@@ -1,2 +1,5 @@
 .DS_store 
 __pycache__
+classification_algorithms/__pycache__
+encoders/__pycache__
+

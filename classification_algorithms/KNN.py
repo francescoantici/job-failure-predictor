@@ -1,8 +1,12 @@
-from typing import Callable, Literal
-from sklearn._typing import Int
+from typing import Literal
 from sklearn.neighbors import KNeighborsClassifier
 
 class KNN(KNeighborsClassifier):
+    
+    """
+    The implementation of the KNN algorithm. 
+    Based on KNeighborsClassifier of scikit-learn
+    """
     
     distance_mapping = {
         "cd" : "cosine", 

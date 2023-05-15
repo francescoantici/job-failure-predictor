@@ -1,8 +1,12 @@
 from typing import Literal
-from sklearn._typing import ArrayLike, Int
 from sklearn.dummy import DummyClassifier 
 
 class RandomBaseline(DummyClassifier): 
+    
+    """
+    The implementation of the random baselines.
+    Based on the DummyClassifier of scikit-learn
+    """
     
     baseline_mapping = {
         "majority" : "prior", 
